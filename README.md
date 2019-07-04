@@ -1,8 +1,8 @@
 # News_Stock_Prediction
 ## Data crawler scripts
-1. stock_data_crawler
+1. **stock_data_crawler**
     * returns stock data obtained from IEX Cloud API
-2. news_data_crawler
+2. **news_data_crawler**
     * returns news data with labels(0: stock decrease, 1: stock increase) from NewsAPI.org
 
 ## JSON data
