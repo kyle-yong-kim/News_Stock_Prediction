@@ -6,6 +6,9 @@
     * returns news data with labels(0: stock decrease, 1: stock increase) from NewsAPI.org
 
 ## JSON data
+There are two JSON files saved within the github repo.
+1. stockQuery.json
+2. newsData_sample.json (wrapped into dataloader for ML training, validation, testing)
 ### Reason for local save
 As we wanted to minize API token consumption, the obtained data are stored locally, in this case, within the github repository.
 Instead of our ML model calling the API, it can instead json.load(local_json_file.json).
