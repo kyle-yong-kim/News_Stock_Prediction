@@ -44,16 +44,20 @@ def mainLoop():
 
     # put a break point just for testing json stuff
     i = 0
-    for companyName, stockData in stockJson.items():
-        i += len(stockData)
-        
+    for companyName, stockData in stockJson.items():        
         # since we are broke and can't pay for pro api version rip
-        if i > 220:
+        if i > 240:
             break
 
         for item in stockData:
-            queryString = queryStringBuilder(companyName, item["date"], topN, "relevancy")
-            newsResult += queryNewsArticle(companyName, queryString, item["label"], item['date'], item['changePercent'])
+            # change the date value in the format of (today - 1month + 1day)
+            # this is needed for news api query to not look beyond max search window of 1 month
+            if item["date"] == "2019-06-04":
+                continue
+            else:
+                i += 1
+                queryString = queryStringBuilder(companyName, item["date"], topN, "relevancy")
+                newsResult += queryNewsArticle(companyName, queryString, item["label"], item['date'], item['changePercent'])
 
     jsonResult = json.dumps(newsResult)
 
