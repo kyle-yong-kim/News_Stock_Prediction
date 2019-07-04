@@ -1,6 +1,6 @@
 # News_Stock_Prediction
 ## Things to work on:
-* Building ML model
+* Building LSTM ML model
 * Training data balancing
 
 ## Data crawler scripts
