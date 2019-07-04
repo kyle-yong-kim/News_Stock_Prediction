@@ -1,5 +1,4 @@
 # News_Stock_Prediction
-Below image will be updated
 ![image](https://drive.google.com/uc?export=view&id=1A95mZ28-8GsQJOB2F8G_rdy2w6vxC0ai)
 ## Things to work on:
 * Building LSTM ML model
