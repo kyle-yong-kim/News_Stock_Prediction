@@ -16,6 +16,9 @@ There are two JSON files saved within the github repo.
     * value: list[dict{changePercent, date, label}]
 2. **newsData_sample.json** (wrapped into dataloader for ML training, validation, testing)
     * list[dict{companyName, date, changePercent, news_title, news_description}]
+    * 426 items in total
+    * 137 items ("label" = 0 --> stock decrease)
+    * 289 items ("label" = 0 --> stock decrease)
 ### Reason for local save
 As we wanted to minize API token consumption, the obtained data are stored locally, in this case, within the github repository.
 Instead of our ML model calling the API for every bootup instance, it can instead statically load json through json.load(local_json_file.json).
