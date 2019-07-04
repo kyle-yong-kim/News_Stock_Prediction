@@ -14,7 +14,7 @@ There are two JSON files saved within the github repo.
     * list[dict{companyName, date, changePercent, news_title, news_description}]
 ### Reason for local save
 As we wanted to minize API token consumption, the obtained data are stored locally, in this case, within the github repository.
-Instead of our ML model calling the API, it can instead json.load(local_json_file.json).
+Instead of our ML model calling the API for every bootup instance, it can instead statically load json through json.load(local_json_file.json).
 ### How to read colorized JSON (for manual data validation)
 1. Open visual studio code
 2. Open any.json file
