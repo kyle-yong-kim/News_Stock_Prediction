@@ -1,4 +1,8 @@
 # News_Stock_Prediction
+## Things to work on:
+* Building ML model
+* Training data balancing
+
 ## Data crawler scripts
 1. **stock_data_crawler**
     * returns stock data obtained from IEX Cloud API
