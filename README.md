@@ -16,7 +16,8 @@ There are two JSON files saved within the github repo.
 As we wanted to minize API token consumption, the obtained data are stored locally, in this case, within the github repository.
 Instead of our ML model calling the API for every bootup instance, it can instead statically load json through json.load(local_json_file.json).
 ### How to read colorized JSON (for manual data validation)
-1. Open visual studio code [download link](https://github.com/user/repo/blob/branch/other_file.md)
+1. Open visual studio code
+      [download link](https://github.com/user/repo/blob/branch/other_file.md)
 2. Open any.json file
 3. Press ctrl + shift + P
 4. Type "Change Language Mode"
