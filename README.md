@@ -6,8 +6,9 @@
 
 ## Things to work on:
 * Updating data crawler to improve data quality (currently having problem with same news articles joint with different labels due to 1 day news query lag)
-* Building LSTM ML model
 * Training data balancing
+* Find out better padding method
+* Building LSTM ML model
 
 ## Data crawler scripts
 1. **stock_data_crawler**
