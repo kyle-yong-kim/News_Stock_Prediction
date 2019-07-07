@@ -1,6 +1,11 @@
 # News_Stock_Prediction
 ![image](https://drive.google.com/uc?export=view&id=1A95mZ28-8GsQJOB2F8G_rdy2w6vxC0ai)
+
+## To run the initial_model:
+* download google300 vector from the following link, [download link](https://s3.amazonaws.com/dl4j-distribution/GoogleNews-vectors-negative300.bin.gz)
+
 ## Things to work on:
+* Updating data crawler to improve data quality (currently having problem with same news articles joint with different labels due to 1 day news query lag)
 * Building LSTM ML model
 * Training data balancing
 
