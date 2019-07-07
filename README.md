@@ -7,7 +7,7 @@
 ## Things to work on:
 * Updating data crawler to improve data quality (currently having problem with same news articles joint with different labels due to 1 day news query lag)
 * Training data balancing
-* Find out better padding method
+* Find out better padding method (without using BucketIterator)
 * Building LSTM ML model
 
 ## Data crawler scripts
