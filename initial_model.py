@@ -1,4 +1,4 @@
-#all imports
+# all imports
 import numpy as np
 import time
 import torch
@@ -8,7 +8,7 @@ import torch.nn.functional as F
 import torch.optim as optim
 import torchvision
 import torchvision.transforms as transforms
-import torchvision.datasets as datasets 
+import torchvision.datasets as datasets
 import matplotlib.pyplot as plt
 from torch.utils.data.sampler import SubsetRandomSampler
 from torch.utils.data import Dataset, DataLoader
@@ -28,17 +28,12 @@ from gensim.models import Word2Vec
 
 from spacy.lang.en import English
 
-# class customData(Dataset):
-#     def __init__(self):
-#     def __getitem__(self, index):
-#         return
-#     def __len__(self):
-#         return self.len
 
 def loadJson(fileLoc):
     with open(fileLoc) as f:
         data = json.load(f)
         return data
+
 
 class TweetBatcher:
     def __init__(self, tweets, batch_size, drop_last=False):
@@ -51,16 +46,16 @@ class TweetBatcher:
             if wlen not in self.tweets_by_length:
                 self.tweets_by_length[wlen] = []
             self.tweets_by_length[wlen].append((words, label),)
-         
+
         #  create a DataLoader for each set of tweets of the same length
-        self.loaders = {wlen : torch.utils.data.DataLoader(
-                                    tweets,
-                                    batch_size=batch_size,
-                                    shuffle=True,
-                                    drop_last=drop_last) # omit last batch if smaller than batch_size
+        self.loaders = {wlen: torch.utils.data.DataLoader(
+            tweets,
+            batch_size=batch_size,
+            shuffle=True,
+            drop_last=drop_last)  # omit last batch if smaller than batch_size
             for wlen, tweets in self.tweets_by_length.items()}
-        
-    def __iter__(self): # called by Python to create an iterator
+
+    def __iter__(self):  # called by Python to create an iterator
         # make an iterator for every tweet length
         iters = [iter(loader) for loader in self.loaders.values()]
         while iters:
@@ -73,16 +68,17 @@ class TweetBatcher:
                 iters.remove(im)
 
 
-def mainLoop():
+def dataSplit(wordLimit):
+    print("Datasplit intialized.")
     # first, load the stock json obtained from stock_data_crawler
     train, valid, test = [], [], []
     fileLoc = "C:\\Temp\\finalData_big_balanced.json"
     modelLoc = "C:\\Temp\\GoogleNews-vectors-negative300.bin.gz"
     # wordLimit = 1000000
-    wordLimit = 2000000
     # wordLimit = 5000
     stockJson = loadJson(fileLoc)
-    model = gensim.models.KeyedVectors.load_word2vec_format(modelLoc, binary=True, limit = wordLimit)
+    model = gensim.models.KeyedVectors.load_word2vec_format(
+        modelLoc, binary=True, limit=wordLimit)
 
     tokenizer = English()
 
@@ -95,10 +91,12 @@ def mainLoop():
         # item['title']
         try:
             # token_list = [word.text for word in tokenizer(item['title'] + item['description'])]
-            token_list = [word.text for word in tokenizer(item['headline'] + " " + item['description'])]
+            token_list = [word.text for word in tokenizer(
+                item['headline'] + " " + item['description'])]
             # model_stoi = {"'m":1, "to":2, "our":8}
 
-            idxs = [model_stoi[word].index for word in token_list if word in model_stoi]
+            idxs = [
+                model_stoi[word].index for word in token_list if word in model_stoi]
             idxs = torch.tensor(idxs)
             label = torch.tensor(int(item['label'])).long()
             if i % 5 < 4:
@@ -110,9 +108,12 @@ def mainLoop():
 
     i2, j2, k2 = len(train), len(valid), len(test)
     # model_emb = nn.Embedding.from_pretrained(model.vectors)
+    print("Datasplit complete.")
     return train, valid, test, model
 
+
 def get_accuracy(model, data_loader):
+    print("Get accuracy initialized.")
     correct, total = 0, 0
     errLog = []
     for tweets, labels in data_loader:
@@ -123,18 +124,12 @@ def get_accuracy(model, data_loader):
             total += labels.shape[0]
         except:
             errLog.append((tweets, labels))
+    print("Get accuracy complete.")
     return correct / total
 
-train, valid, test, model = mainLoop()
-
-weights = torch.FloatTensor(model.vectors)
-embedding = nn.Embedding.from_pretrained(weights)
-
-train_loader = TweetBatcher(train, batch_size=128, drop_last=False)
-valid_loader = TweetBatcher(valid, batch_size=128, drop_last=False)
 
 class NewsRNN(nn.Module):
-    def __init__(self, input_size, hidden_size, num_classes):
+    def __init__(self, input_size, hidden_size, num_classes, embedding):
         super(NewsRNN, self).__init__()
         self.emb = embedding
 
@@ -145,7 +140,7 @@ class NewsRNN(nn.Module):
         self.fc1 = nn.Linear(hidden_size, 75)
         self.fc2 = nn.Linear(75, num_classes)
         self.relu = nn.ReLU()
-    
+
     def forward(self, x):
         # Look up the embedding
         x = self.emb(x)
@@ -158,9 +153,10 @@ class NewsRNN(nn.Module):
         out = self.fc2(out)
         return out
 
-class NewsLSTM(nn.Module):
-    def __init__(self, input_size, hidden_size, num_layers, num_classes):
-        super(NewsLSTM, self).__init__()
+
+class NewsLSTN(nn.Module):
+    def __init__(self, input_size, hidden_size, num_layers, num_classes, embedding):
+        super(NewsLSTN, self).__init__()
         self.emb = embedding
 
         # 300 since vector is of size 300
@@ -168,12 +164,13 @@ class NewsLSTM(nn.Module):
         self.hidden_size = hidden_size
         self.num_layers = num_layers
 
-        self.rnn = nn.LSTM(input_size, hidden_size, num_layers, batch_first=True)
+        self.rnn = nn.LSTM(input_size, hidden_size,
+                           num_layers, batch_first=True)
         self.fc_1 = nn.Linear(hidden_size, 150)
         self.fc_2 = nn.Linear(150, 50)
         self.fc_3 = nn.Linear(50, num_classes)
         self.relu = nn.ReLU()
-    
+
     def forward(self, x):
         # Look up the embedding
         x = self.emb(x)
@@ -188,6 +185,7 @@ class NewsLSTM(nn.Module):
         out = self.fc_3(out)
 
         return out
+
 
 def train_rnn_network(model, train_loader, valid_loader, num_epochs, learning_rate):
     criterion = nn.CrossEntropyLoss()
@@ -227,26 +225,25 @@ def train_rnn_network(model, train_loader, valid_loader, num_epochs, learning_ra
     plt.legend(loc='best')
     plt.show()
 
-model_simple = NewsRNN(300, 600, 2)
 
-model_complex = NewsLSTM(300, 950, 2, 2)
+def mainLoop():
+    train, valid, test, model = dataSplit(wordLimit=500)
 
-# what does the 2 do? memory layer or hidden layer...?
-model_complex = NewsLSTM(300, 2000, 2, 2)
+    weights = torch.FloatTensor(model.vectors)
+    embedding = nn.Embedding.from_pretrained(weights)
 
-print(get_accuracy(model_complex, train_loader))
+    train_loader = TweetBatcher(train, batch_size=128, drop_last=False)
+    valid_loader = TweetBatcher(valid, batch_size=128, drop_last=False)
 
-# why does this give the same answer as above...
-# val = 0
-# for i in range(0,20):
-#     val += get_accuracy(model, train_loader)
+    # valina RNN and LSTM
+    model_simple = NewsRNN(300, 600, 2, embedding)
+    model_complex = NewsLSTN(300, 2000, 3, 2, embedding)
 
-# print(val/20)
+    print(get_accuracy(model_complex, train_loader))
+    train_rnn_network(model_simple, train_loader, valid_loader,
+                      num_epochs=100, learning_rate=1e-4)
 
-# train_rnn_network(model, train_loader, valid_loader, num_epochs = 70, learning_rate=3e-6)
-# train_rnn_network(model_complex, train_loader, valid_loader, num_epochs = 30, learning_rate=3e-5)
-train_rnn_network(model_simple, train_loader, valid_loader, num_epochs = 100, learning_rate=1e-4)
 
-# train_padded = pad_sequence([tweet for tweet, label in train[:30]], batch_first = True)
+mainLoop()
 
 print("done")
